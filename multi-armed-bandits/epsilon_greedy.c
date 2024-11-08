@@ -13,7 +13,7 @@ struct Problem {
 struct Agent {
     float epsilon;
     float* value_estimates;
-    int iteration;
+    int* action_counts;
 };
 
 float sample_normal(const float mean, const float stddev) {
@@ -58,8 +58,8 @@ float get_reward(const struct Problem problem, const int action) {
 }
 
 void update_agent(struct Agent agent, int action, float reward) {
-    ++agent.iteration;
-    const float step_size = 1.0f / agent.iteration;
+    ++agent.action_counts[action];
+    const float step_size = 1.0f / agent.action_counts[action];
     const float error = reward - agent.value_estimates[action];
     agent.value_estimates[action] += step_size * error;
 }
@@ -67,7 +67,7 @@ void update_agent(struct Agent agent, int action, float reward) {
 void run_trial(float* rewards, const struct Problem problem, struct Agent agent, const int num_steps) {
     memset(rewards, 0, num_steps * sizeof(float));
     memset(agent.value_estimates, 0, problem.num_actions * sizeof(float));
-    agent.iteration = 0;
+    memset(agent.action_counts, 0, problem.num_actions * sizeof(int));
 
     for (int step = 0; step != num_steps; ++step) {
         int action = get_action(agent, problem.num_actions);
@@ -132,7 +132,11 @@ int main(int argc, char** argv) {
         fprintf(stderr, "Memory allocation failed for agent.value_estimates\n");
         exit(1);
     }
-    agent.iteration = 0;
+    agent.action_counts = malloc(num_actions * sizeof(int));
+    if (agent.action_counts == NULL) {
+        fprintf(stderr, "Memory allocation failed for agent.action_counts\n");
+        exit(1);
+    }
 
     float* rewards = malloc(num_runs * num_steps * sizeof(float));
     if (rewards == NULL) {
