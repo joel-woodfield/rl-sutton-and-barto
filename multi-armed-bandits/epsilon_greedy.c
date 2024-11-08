@@ -150,5 +150,6 @@ int main(int argc, char** argv) {
     free(rewards);
     free(problem.values);
     free(agent.value_estimates);
+    free(agent.action_counts);
     return 0;
 }
