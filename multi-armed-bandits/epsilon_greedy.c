@@ -116,14 +116,6 @@ double normal_pdf(const double x) {
     return (1.0 / sqrt(2.0 * M_PI)) * exp(-0.5 * x * x);
 }
 
-double power(const double x, const int n) {
-    double result = 1;
-    for (int i = 0; i != n; ++i) {
-        result *= x;
-    }
-    return result;
-}
-
 float expected_final_reward(float epsilon, int num_actions) {
     // Let X_1, ..., X_n be the sampled values for the n actions (iid standard normal)
     // let \phi(x) and \Phi(x) be the standard normal pdf and cdf respectively
@@ -144,8 +136,7 @@ float expected_final_reward(float epsilon, int num_actions) {
     double integral = 0;
     double x = lower_bound;
     while (x < upper_bound) {
-        double cdf_part = power(normal_cdf(x), num_actions - 1);
-        integral += x * normal_pdf(x) * cdf_part * step_size;
+        integral += x * normal_pdf(x) * pow(normal_cdf(x), num_actions - 1) * step_size;
         x += step_size;
     }
 
