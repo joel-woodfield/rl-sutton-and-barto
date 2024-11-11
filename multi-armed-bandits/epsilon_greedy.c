@@ -64,7 +64,7 @@ void update_agent(struct Agent agent, int action, float reward) {
     agent.value_estimates[action] += step_size * error;
 }
 
-void run_trial(float* rewards, const struct Problem problem, struct Agent agent, const int num_steps) {
+float run_trial(float* rewards, const struct Problem problem, struct Agent agent, const int num_steps) {
     memset(rewards, 0, num_steps * sizeof(float));
     memset(agent.value_estimates, 0, problem.num_actions * sizeof(float));
     memset(agent.action_counts, 0, problem.num_actions * sizeof(int));
@@ -75,13 +75,19 @@ void run_trial(float* rewards, const struct Problem problem, struct Agent agent,
         rewards[step] = reward;
         update_agent(agent, action, reward);
     }
+
+    float final_reward = rewards[num_steps - 1];
+    return final_reward;
 }
 
-void run_trials(float* rewards, const struct Problem problem, const struct Agent agent, const int num_runs, const int num_steps) {
+float run_trials(float* rewards, const struct Problem problem, const struct Agent agent, const int num_runs, const int num_steps) {
+    float sum_final_reward = 0;
     for (int run = 0; run != num_runs; ++run) {
         init_values(problem.values, problem.num_actions);
-        run_trial(rewards + num_steps * run, problem, agent, num_steps);
+        sum_final_reward += run_trial(rewards + num_steps * run, problem, agent, num_steps);
     }
+
+    return sum_final_reward / num_runs;
 }
 
 void save_rewards(const char* filename, const float* rewards, const int num_runs, const int num_steps) {
@@ -102,6 +108,51 @@ void save_rewards(const char* filename, const float* rewards, const int num_runs
     fclose(file);
 }
 
+double normal_cdf(const double x) {
+    return 0.5 * (1.0 + erf(x / sqrt(2.0)));
+}
+
+double normal_pdf(const double x) {
+    return (1.0 / sqrt(2.0 * M_PI)) * exp(-0.5 * x * x);
+}
+
+double power(const double x, const int n) {
+    double result = 1;
+    for (int i = 0; i != n; ++i) {
+        result *= x;
+    }
+    return result;
+}
+
+float expected_final_reward(float epsilon, int num_actions) {
+    // Let X_1, ..., X_n be the sampled values for the n actions (iid standard normal)
+    // let \phi(x) and \Phi(x) be the standard normal pdf and cdf respectively
+    // Let R be the final reward
+    //
+    // P(\max(X_1, ..., X_n) < x) = P(X_1 < x && ... && X_n < x) = \Phi(x)^n
+    //
+    // E(R) = epsilon * E((X_1 + ... X_n)/n) + (1 - epsilon) * E(max(X_1, ..., X_n))
+    //      = (1 - epsilon) * E(max(X_1, ..., X_n))
+    //      = (1 - epislon) * \int_{-\infty}^\infty x d/dx P(\max(X_1, ..., X_n) < x) dx
+    //      = (1 - epislon) * \int_{-\infty}^\infty x d/dx \Phi(x)^n dx
+    //      = (1 - epislon) * n * \int_{-\infty}^\infty x \phi(x) * \Phi(x)^{n-1} dx
+
+    // compute integral
+    double step_size = 0.00001;
+    double lower_bound = -5.0;
+    double upper_bound = 5.0;
+    double integral = 0;
+    double x = lower_bound;
+    while (x < upper_bound) {
+        double cdf_part = power(normal_cdf(x), num_actions - 1);
+        integral += x * normal_pdf(x) * cdf_part * step_size;
+        x += step_size;
+    }
+
+    float expectation = (1 - epsilon) * num_actions * integral;
+    return expectation;
+}
+
 int main(int argc, char** argv) {
     if (argc != 7) {
         fprintf(stderr, "Requires 7 arguments\n");
@@ -113,6 +164,8 @@ int main(int argc, char** argv) {
     const int num_steps = atoi(argv[4]);
     const int num_runs = atoi(argv[5]);
     const char* output_file = argv[6];
+    printf("eps: %f, num_actions: %d, var: %f, num_steps: %d, num_runs: %d\n",
+        epsilon, num_actions, variance, num_steps, num_runs);
 
     srand(time(NULL));
 
@@ -144,8 +197,11 @@ int main(int argc, char** argv) {
         exit(1);
     }
 
-    run_trials(rewards, problem, agent, num_runs, num_steps);
+    float avg_final_reward = run_trials(rewards, problem, agent, num_runs, num_steps);
     save_rewards(output_file, rewards, num_runs, num_steps);
+    printf("Average Final Reward: %f\n", avg_final_reward);
+    float expected = expected_final_reward(epsilon, num_actions);
+    printf("Expected Average Final Reward: %f\n", expected);
 
     free(rewards);
     free(problem.values);
