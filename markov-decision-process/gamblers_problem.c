@@ -5,9 +5,11 @@
 #include <math.h>
 #include <stdlib.h>
 #include <stdbool.h>
+#include <stdio.h>
+
 #include "gamblers_problem.h"
 
-static int _transition_matrix_index(float* transition_matrix, MdpTuple tuple) {
+static int _transition_matrix_index(MdpTuple tuple) {
     static int dim3_step_size = NUM_REWARDS * GOAL_CAPITAL * GOAL_CAPITAL;
     static int dim2_step_size = GOAL_CAPITAL * GOAL_CAPITAL;
     static int dim1_step_size = GOAL_CAPITAL;
@@ -17,22 +19,25 @@ static int _transition_matrix_index(float* transition_matrix, MdpTuple tuple) {
 }
 
 static float _get_transition_matrix(float* transition_matrix, MdpTuple tuple) {
-    int index = _transition_matrix_index(transition_matrix, tuple);
+    int index = _transition_matrix_index(tuple);
     return transition_matrix[index];
 }
 
 static void _set_transition_matrix(float* transition_matrix, float prob, MdpTuple tuple) {
-    int index = _transition_matrix_index(transition_matrix, tuple);
+    int index = _transition_matrix_index(tuple);
     transition_matrix[index] = prob;
 }
 
-static float* _init_transition_matrix(int num_states, int num_actions) {
+static float* _init_transition_matrix() {
     // p(s',r|s,a) ==> Matrix of NUM_STATES x NUM_REWARDS x NUM_STATES x NUM_ACTIONS
-    size_t matrix_size = num_states * NUM_REWARDS * num_states * num_actions;
+    static int matrix_size = (GOAL_CAPITAL + 1) * NUM_REWARDS * (GOAL_CAPITAL + 1) * (GOAL_CAPITAL + 1);
     // initialize all probabilities to 0
     float* matrix = calloc(matrix_size, sizeof(float));
+    if (matrix == NULL) {
+        printf("Failed to allocate memory for transition matrix\n");
+    }
 
-    for (int current_state = 0; current_state < num_states; ++current_state) {
+    for (int current_state = 0; current_state <= GOAL_CAPITAL; ++current_state) {
         // get all possible actions from current state
         int capital = current_state;
         int max_stake = capital;
@@ -62,13 +67,15 @@ static float* _init_transition_matrix(int num_states, int num_actions) {
             _set_transition_matrix(matrix, lose_prob, lose_transition);
         }
     }
+    return matrix;
 }
 
-void init_gamblers_problem(Mdp* mdp) {
-    mdp->num_states = GOAL_CAPITAL;
-    mdp->num_actions = GOAL_CAPITAL;  // max_s(A(s))
-    mdp->transition_matrix = _init_transition_matrix(mdp->num_states, mdp->num_actions);
-    mdp->terminal_state = 0;
+void init_gamblers_problem(Mdp* mdp, int* init_state) {
+    mdp->num_states = GOAL_CAPITAL + 1;
+    mdp->num_actions = GOAL_CAPITAL + 1;  // max_s(A(s))
+    mdp->transition_matrix = _init_transition_matrix();
+    mdp->terminal_state = -1;
+    *init_state = START_CAPITAL;
 }
 
 void action_set_gamblers_problem(Mdp* mdp, int current_state, int** valid_actions, int* num_valid_actions) {
@@ -80,8 +87,8 @@ void action_set_gamblers_problem(Mdp* mdp, int current_state, int** valid_action
 
     *num_valid_actions = max_stake;
     *valid_actions = malloc(*num_valid_actions * sizeof(int));
-    for (int i = 0; i < max_stake; ++i) {
-        valid_actions[i] = i;
+    for (int i = 0; i <= max_stake; ++i) {
+        (*valid_actions)[i] = i;
     }
 }
 
@@ -95,5 +102,4 @@ bool is_done_gamblers_problem(Mdp* mdp, int current_state) {
 
 void delete_gamblers_problem(Mdp* mdp) {
     free(mdp->transition_matrix);
-    free(mdp);
 }

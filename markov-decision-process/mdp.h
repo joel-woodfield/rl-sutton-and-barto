@@ -22,6 +22,6 @@ typedef struct {
     int reward;
     int current_state;
     int action;
-} MdpTuple
+} MdpTuple;
 
 #endif //MDP_H
