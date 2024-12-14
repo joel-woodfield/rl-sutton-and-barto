@@ -10,9 +10,12 @@
 #include "mdp.h"
 
 #define GOAL_CAPITAL 100
-#define HEAD_PROBABILITY 0.5
+#define HEAD_PROBABILITY 0.5f
 #define NUM_REWARDS 2
 #define START_CAPITAL 1
+#define NUM_ACTIONS GOAL_CAPITAL  // 0 -> GOAL_CAPITAL-1 (inclusive)
+#define NUM_STATES (2 * (GOAL_CAPITAL - 1) + 2)  // 0 -> 2*(GOAL_CAPITAL-1) (inclusive) + terminal state
+#define TERMINAL_STATE (NUM_STATES - 1)
 
 void init_gamblers_problem(Mdp* mdp, int* init_state);
 float transition_gamblers_problem(Mdp* mdp, MdpTuple tuple);

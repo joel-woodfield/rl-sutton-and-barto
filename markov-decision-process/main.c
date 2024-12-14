@@ -7,30 +7,20 @@
 
 #include "mdp.h"
 #include "gamblers_problem.h"
+#include "policy_iteration.h"
 
-#define NUM_ITERATIONS 1
+#define MAX_ITERATIONS 1000
 
 int main() {
     Mdp mdp;
     int state;
     init_gamblers_problem(&mdp, &state);
 
-    int* valid_actions;
-    int num_actions;
-    for (int i = 0; i < NUM_ITERATIONS; ++i) {
-        action_set_gamblers_problem(&mdp, state, &valid_actions, &num_actions);
-        const int random_idx = rand() % num_actions;
-        const int action = valid_actions[random_idx];
-        MdpTuple transition;
-        transition.action = action;
-        transition.current_state = state;
-        transition.next_state = state;
-        transition.reward = 0;
-        printf("Prob: %f\n", transition_gamblers_problem(&mdp, transition));
-        transition.next_state = state + action;
-        printf("Prob: %f\n", transition_gamblers_problem(&mdp, transition));
+    PolicyIterationAgent agent;
+    init_policy_iteration(&agent, &mdp, 1e-4f, 0.99f);
+    solve_mdp(&agent, MAX_ITERATIONS, &mdp, transition_gamblers_problem,
+              action_set_gamblers_problem);
 
-        free(valid_actions);
-    }
     delete_gamblers_problem(&mdp);
+    delete_policy_iteration(&agent);
 }
