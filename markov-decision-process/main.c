@@ -10,6 +10,7 @@
 #include "policy_iteration.h"
 
 #define MAX_ITERATIONS 1000
+#define OUTPUT_FILE_PATH "../outputs/gambler.csv"
 
 int main() {
     Mdp mdp;
@@ -21,6 +22,7 @@ int main() {
     solve_mdp(&agent, MAX_ITERATIONS, &mdp, transition_gamblers_problem,
               action_set_gamblers_problem);
 
+    save_policy_iteration(&agent, OUTPUT_FILE_PATH);
     delete_gamblers_problem(&mdp);
     delete_policy_iteration(&agent);
 }

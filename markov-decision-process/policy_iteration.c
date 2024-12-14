@@ -129,6 +129,21 @@ bool imp_policy(PolicyIterationAgent* agent, Mdp* mdp,
     return policy_converged;
 }
 
+void save_policy_iteration(PolicyIterationAgent* agent, char* file_path) {
+    FILE* file = fopen(file_path, "w");
+    if (file == NULL) {
+        printf("Failed to open file %s\n", file_path);
+        exit(1);
+    }
+
+    // save as csv file: state,value,policy
+    fprintf(file, "state,value,policy\n");
+    for (int state = 0; state < agent->num_states; ++state) {
+        fprintf(file, "%d,%f,%d\n", state, agent->value[state], agent->policy[state]);
+    }
+
+}
+
 void delete_policy_iteration(PolicyIterationAgent* agent) {
     free(agent->value);
     free(agent->policy);

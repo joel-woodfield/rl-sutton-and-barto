@@ -25,6 +25,7 @@ void eval_policy(PolicyIterationAgent* agent, Mdp* mdp,
 bool imp_policy(PolicyIterationAgent* agent, Mdp* mdp,
                 float (*transition)(Mdp*, MdpTuple), 
                 void (*action_set)(Mdp*, int, int**, int*));
+void save_policy_iteration(PolicyIterationAgent* agent, char* file_path);
 void delete_policy_iteration(PolicyIterationAgent* agent);
 
 
