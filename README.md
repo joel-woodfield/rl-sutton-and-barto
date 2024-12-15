@@ -1,10 +1,14 @@
 # rl-sutton-and-barto
 
-## Implemented
-* epsilon greedy for MAB
+## Implemented algorithms
+* epsilon greedy (MAB)
+* policy iteration
+
+## Implemented environments
+* Multi-armed bandits
+* Gambler's Problem
 
 ## To implement
-* mdp environments
 * q-learning
 * dqn
 * rainbow
