@@ -1,17 +1,18 @@
 # rl-sutton-and-barto
 
-## Implemented algorithms
-* epsilon greedy (MAB)
-* policy iteration
+## Problems
+* MAB (multi-armed bandits)
+* MDP (markov decision process)
+* (todo) Experience MDP (MDP without transition matrix)
+* Experience MRP (markov reward process - MDP without actions)
 
 ## Implemented environments
-* Multi-armed bandits
-* Gambler's Problem
+* Multi-armed bandits (mab)
+* Gambler's problem (mdp)
+* Random walk (experience-mrp)
 
-## To implement
-* q-learning
-* dqn
-* rainbow
-* sac
-* ppo
-* muzero
+## Implemented algorithms
+* Epsilon-greedy (mab)
+* Policy iteration (mdp)
+* TD0 (experience-mrp)
+* MC (experience-mrp)
