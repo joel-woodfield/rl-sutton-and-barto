@@ -6,9 +6,8 @@
 #define MRP_H
 
 typedef struct {
-	int num_states;
+    int num_states;
     int num_rewards;
-	float* transition_matrix;
 	int terminal_state;
 } Mrp;
 

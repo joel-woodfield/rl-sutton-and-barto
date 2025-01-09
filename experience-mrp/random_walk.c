@@ -29,9 +29,6 @@ int init_random_walk(Mrp* mrp) {
     mrp->num_rewards = NUM_REWARDS;
     mrp->terminal_state = TERMINAL_STATE;
 
-    // the matrix will not be stored - sampling is taken care of by step_ranodm_walk().
-    mrp->transition_matrix = NULL;
-
     return INITIAL_STATE;
 }
 
