@@ -4,6 +4,7 @@
 
 #include <stdlib.h>
 #include <stdio.h>
+#include <stdbool.h>
 
 #include "mc.h"
 
@@ -12,6 +13,13 @@ void train_mc(Mrp* mrp, int (*init_mrp)(Mrp*), StateRewardPair (*step_mrp)(Mrp*,
     for (int i = 0; i != mrp->num_states; ++i) {
         value[i] = 0;
     }
+
+    bool avg_step_size = alpha < 0;
+    int* state_counts;
+    if (avg_step_size) {
+        state_counts = calloc(mrp->num_states, sizeof(int));
+    }
+        
 
     for (int e = 0; e < num_episodes; ++e) {
         int initial_state = init_mrp(mrp);
@@ -44,12 +52,20 @@ void train_mc(Mrp* mrp, int (*init_mrp)(Mrp*), StateRewardPair (*step_mrp)(Mrp*,
                 state = episode[t].state;
             }
                 
+            if (avg_step_size) {
+                ++state_counts[s2i_mrp(state)];
+                alpha = 1 / (float)state_counts[s2i_mrp(state)];
+            }
+            
             float error = ret - value[s2i_mrp(state)];
             value[s2i_mrp(state)] = value[s2i_mrp(state)] + alpha * error;
         }
             
         free(episode);
-        
+    }
+
+    if (avg_step_size) {
+        free(state_counts);
     }
 }
             
