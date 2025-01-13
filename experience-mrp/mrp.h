@@ -12,7 +12,7 @@ typedef struct {
 
 typedef struct {
     int num_states;
-	int terminal_state;
+    int terminal_state;
     int (*reset)();
     StateRewardPair (*step)(int state);
     int (*s2i)(int state);
