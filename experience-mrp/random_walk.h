@@ -21,22 +21,24 @@
 #define RIGHT_PROB 1 - LEFT_PROB
 
 /**
- * Initializes the mrp object and returns the initial state.
+ * Initializes the mrp object
  */
-int init_random_walk(Mrp* mrp);
+void init_random_walk(Mrp* mrp);
 
 /**
- * Returns the next state and reward based on the given mrp and state.
+ * Returns an initial state from the initial state distribution.
  */
-StateRewardPair step_random_walk(Mrp* mrp, int current_state);
+int reset_random_walk();
 
 /**
- * Returns whether the given state is a terminal state.
+ * Returns the next state and reward based on the given state.
  */
-bool is_done_random_ralk(Mrp* mrp, int state);
+StateRewardPair step_random_walk(int current_state);
 
-void delete_random_walk(Mrp* mrp);
-
+/**
+ * Returns a unique positive index corresponding to the given state.
+ * Useful for array indexing.
+ */
 int s2i_random_walk(int state);
 
 #endif //RANDOM_WALK_H

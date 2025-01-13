@@ -8,8 +8,7 @@
 
 #include "mc.h"
 
-void train_mc(Mrp* mrp, int (*init_mrp)(Mrp*), StateRewardPair (*step_mrp)(Mrp*, int),
-           int (*s2i_mrp)(int), float* value, float gamma, float alpha, int num_episodes) {
+void train_mc(Mrp* mrp, float* value, float gamma, float alpha, int num_episodes) {
     for (int i = 0; i != mrp->num_states; ++i) {
         value[i] = 0;
     }
@@ -22,7 +21,7 @@ void train_mc(Mrp* mrp, int (*init_mrp)(Mrp*), StateRewardPair (*step_mrp)(Mrp*,
         
 
     for (int e = 0; e < num_episodes; ++e) {
-        int initial_state = init_mrp(mrp);
+        int initial_state = mrp->reset();
         // dynamically growing array
         int episode_size = 1000;
         StateRewardPair* episode = malloc(episode_size * sizeof(StateRewardPair));
@@ -30,7 +29,7 @@ void train_mc(Mrp* mrp, int (*init_mrp)(Mrp*), StateRewardPair (*step_mrp)(Mrp*,
         // collect episode
         int step = 0;
         for (int state = initial_state; state != mrp->terminal_state; ) {
-            StateRewardPair next = step_mrp(mrp, state);
+            StateRewardPair next = mrp->step(state);
             episode[step++] = next;
             state = next.state;
     
@@ -53,12 +52,12 @@ void train_mc(Mrp* mrp, int (*init_mrp)(Mrp*), StateRewardPair (*step_mrp)(Mrp*,
             }
                 
             if (avg_step_size) {
-                ++state_counts[s2i_mrp(state)];
-                alpha = 1 / (float)state_counts[s2i_mrp(state)];
+                ++state_counts[mrp->s2i(state)];
+                alpha = 1 / (float)state_counts[mrp->s2i(state)];
             }
             
-            float error = ret - value[s2i_mrp(state)];
-            value[s2i_mrp(state)] = value[s2i_mrp(state)] + alpha * error;
+            float error = ret - value[mrp->s2i(state)];
+            value[mrp->s2i(state)] = value[mrp->s2i(state)] + alpha * error;
         }
             
         free(episode);

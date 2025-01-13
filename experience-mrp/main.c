@@ -27,7 +27,7 @@ int main() {
     printf("TD0\n");
     float sse = 0;
     float* value = malloc(mrp.num_states * sizeof(float));
-    train_td0(&mrp, init_random_walk, step_random_walk, s2i_random_walk, value, gamma, alpha, num_episodes);
+    train_td0(&mrp, value, gamma, alpha, num_episodes);
 
     for (int state = LEFT_EDGE; state <= RIGHT_EDGE; ++state) {
         sse += powf(value[s2i_random_walk(state)] - true_value[s2i_random_walk(state)], 2);
@@ -41,7 +41,7 @@ int main() {
     printf("TD0 average step size\n");
     sse = 0;
     value = malloc(mrp.num_states * sizeof(float));
-    train_td0(&mrp, init_random_walk, step_random_walk, s2i_random_walk, value, gamma, -1, num_episodes);
+    train_td0(&mrp, value, gamma, -1, num_episodes);
 
     for (int state = LEFT_EDGE; state <= RIGHT_EDGE; ++state) {
         sse += powf(value[s2i_random_walk(state)] - true_value[s2i_random_walk(state)], 2);
@@ -55,7 +55,7 @@ int main() {
     printf("MC\n");
     sse = 0;
     value = malloc(mrp.num_states * sizeof(float));
-    train_mc(&mrp, init_random_walk, step_random_walk, s2i_random_walk, value, gamma, alpha, num_episodes);
+    train_mc(&mrp, value, gamma, alpha, num_episodes);
 
     for (int state = LEFT_EDGE; state <= RIGHT_EDGE; ++state) {
         sse += powf(value[s2i_random_walk(state)] - true_value[s2i_random_walk(state)], 2);
@@ -69,7 +69,7 @@ int main() {
     printf("MC average step size\n");
     sse = 0;
     value = malloc(mrp.num_states * sizeof(float));
-    train_mc(&mrp, init_random_walk, step_random_walk, s2i_random_walk, value, gamma, -1, num_episodes);
+    train_mc(&mrp, value, gamma, -1, num_episodes);
 
     for (int state = LEFT_EDGE; state <= RIGHT_EDGE; ++state) {
         sse += powf(value[s2i_random_walk(state)] - true_value[s2i_random_walk(state)], 2);
