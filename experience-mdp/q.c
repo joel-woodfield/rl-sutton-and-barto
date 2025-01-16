@@ -62,6 +62,5 @@ void train_q(Mdp* mdp, float** value, float gamma, float alpha,
 
             state = next.state;
         }
-
     }
 }
