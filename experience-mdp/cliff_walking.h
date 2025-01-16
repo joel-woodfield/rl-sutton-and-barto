@@ -29,5 +29,7 @@ int reset_cliff_walking();
 StateRewardPair step_cliff_walking(int state, int action);
 int s2i_cliff_walking(int state);
 
+void print_optimal_actions_cliff_walking(Mdp* mdp, float** value);
+
 
 #endif //CLIFF_WALKING_H
