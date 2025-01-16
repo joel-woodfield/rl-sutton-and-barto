@@ -8,7 +8,6 @@ set(HEADERS
     sarsa.h
     expected_sarsa.h
     q.h
-    epsilon_greedy.h
     cliff_walking.h
 )
 
@@ -17,7 +16,6 @@ set(SOURCES
     sarsa.c
     expected_sarsa.c
     q.c
-    epsilon_greedy.c
     cliff_walking.c
 )
 
