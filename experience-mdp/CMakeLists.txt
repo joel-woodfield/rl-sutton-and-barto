@@ -6,6 +6,7 @@ set(CMAKE_C_STANDARD 11)
 set(HEADERS
     mdp.h
     sarsa.h
+    q.h
     epsilon_greedy.h
     cliff_walking.h
 )
@@ -13,6 +14,7 @@ set(HEADERS
 set(SOURCES
     main.c
     sarsa.c
+    q.c
     epsilon_greedy.c
     cliff_walking.c
 )

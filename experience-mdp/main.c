@@ -2,13 +2,14 @@
 #include <stdio.h>
 
 #include "cliff_walking.h"
+#include "q.h"
 #include "sarsa.h"
 
 int main() {
     float gamma = 1;
     float alpha = 0.01;
     float epsilon = 0.1;
-    int num_episodes = 1000000;
+    int num_episodes = 3000;
     Mdp mdp;
     init_cliff_walking(&mdp);
 
@@ -17,7 +18,7 @@ int main() {
         value[state] = malloc(mdp.num_actions * sizeof(float));
     }
 
-    train_sarsa(&mdp, value, gamma, alpha, epsilon, num_episodes);
+    train_q(&mdp, value, gamma, alpha, epsilon, num_episodes);
 
     for (int y = GRID_HEIGHT - 1; y >= 0; --y) {
         for (int x = 0; x < GRID_WIDTH; ++x) {
@@ -56,8 +57,8 @@ int main() {
                 c = 'o';
             }
 
-            printf("%c ", c);
-            // printf("%f ", value[state][3]);
+            // printf("%c ", c);
+            printf("%f ", value[state][3]);
         }
         printf("\n");
     }
