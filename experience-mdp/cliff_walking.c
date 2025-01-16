@@ -1,6 +1,7 @@
 //
 // Created by Joel Woodfield on 13/01/2025
 //
+#include <stdio.h>
 
 #include "cliff_walking.h"
 
@@ -37,6 +38,9 @@ StateRewardPair step_cliff_walking(int state, int action) {
 
     // return same state if out of bounds
     if (next_state < 0 || next_state >= TERMINAL_STATE) {
+        return (StateRewardPair){.state = state, .reward = DEFAULT_REWARD};
+    }
+    if ((next_state / GRID_WIDTH) != (state / GRID_WIDTH) && (next_state % GRID_WIDTH) != (state % GRID_WIDTH)) {
         return (StateRewardPair){.state = state, .reward = DEFAULT_REWARD};
     }
 
