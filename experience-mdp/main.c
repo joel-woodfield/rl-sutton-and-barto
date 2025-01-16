@@ -9,7 +9,7 @@ int main() {
     float gamma = 1;
     float alpha = 0.01;
     float epsilon = 0.1;
-    int num_episodes = 3000;
+    int num_episodes = 1000000;
     Mdp mdp;
     init_cliff_walking(&mdp);
 
@@ -57,8 +57,8 @@ int main() {
                 c = 'o';
             }
 
-            // printf("%c ", c);
-            printf("%f ", value[state][3]);
+            printf("%c ", c);
+            // printf("%f ", value[state][3]);
         }
         printf("\n");
     }

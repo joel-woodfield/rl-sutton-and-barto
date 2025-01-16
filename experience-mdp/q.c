@@ -13,7 +13,7 @@ static int random_action(Mdp* mdp) {
     return action;
 }
 
-static int optimal_value(Mdp* mdp, float** value, int state) {
+static float optimal_value(Mdp* mdp, float** value, int state) {
     float max_value = value[state][0];
     for (int action = 1; action < mdp->num_actions; ++action) {
         if (value[state][action] > max_value) {
